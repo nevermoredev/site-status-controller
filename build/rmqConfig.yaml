@@ -1,0 +1,4 @@
+User      : test
+Host      : 127.0.0.12
+Port      : 5672
+Password  : password

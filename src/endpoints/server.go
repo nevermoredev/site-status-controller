@@ -1,12 +1,10 @@
 package endpoints
 
-
 import (
 	"encoding/json"
-	"fmt"
-"github.com/gorilla/mux"
-"log"
-"net/http"
+	"github.com/gorilla/mux"
+	"log"
+	"net/http"
 )
 
 
@@ -43,8 +41,8 @@ func UpServer() *mux.Route {
 	//		fmt.Printf("%s", responseLocaleMap)
 	//	}
 	//})
-	fmt.Print("Server up...")
-	log.Fatal(http.ListenAndServe("localhost:26009", r))
+	//fmt.Print("Server up...")
+	//log.Fatal(http.ListenAndServe("localhost:26009", r))
 
 	return nil
 }
