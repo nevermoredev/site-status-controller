@@ -8,11 +8,11 @@ import (
 	"zeithub.com/site-status-controller/src/settings"
 )
 
-func GetTitle(id string, url string) (string,string,string) {
+func GetTitle(id string, url string) (string, string, string) {
 
 	data := checker.CheckTitle(url)
 
-	return data,id,url
+	return data, id, url
 }
 
 func GetStatus(data map[string]string) map[string]uint16 {

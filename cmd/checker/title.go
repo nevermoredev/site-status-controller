@@ -5,11 +5,12 @@ import (
 	"log"
 	"net/http"
 )
+
 func CheckTitle(urlNow string) string {
 
 	res, err := http.Get(urlNow)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%s", err)
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
@@ -19,8 +20,12 @@ func CheckTitle(urlNow string) string {
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%s", err)
 	}
 
-	return doc.Find("title").Text()
+	title := doc.Find("title").Text()
+
+	//log.Printf("Received a message: %s", title)
+
+	return title
 }

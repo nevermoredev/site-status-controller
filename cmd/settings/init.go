@@ -1,8 +1,7 @@
 package settings
 
-
 type Settings struct {
-	Timer int
+	Timer     int
 	Timeout   int
 	File      string
 	Useragent string
