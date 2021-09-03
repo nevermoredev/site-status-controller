@@ -54,13 +54,14 @@ func Listen() {
 
 	go func() {
 		for d := range msgs {
-			p := &RmqProto.BotJobResponse{}
+			p := &RmqProto.BotJob{}
 			if err := proto.Unmarshal(d.Body, p); err != nil {
 				log.Fatalln("Failed to parse Person:", err)
 			}
 			log.Printf("%s",p.PageUrl)
-			 	pageInfo := checker.TestSite(p.PageId,p.PageUrl)
+			 	pageInfo := checker.TestSite(p.PageId,p.PageUrl,p.Title,p.Action)
 			Send(pageInfo)
+
 
 		}
 	}()

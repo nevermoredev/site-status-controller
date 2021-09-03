@@ -4,9 +4,11 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/adrg/strutil"
+	"github.com/adrg/strutil/metrics"
 	"log"
 	"net/http"
-	"zeithub.com/site-status-controller/pkg/config/protobuf"
+	RmqProto "zeithub.com/site-status-controller/pkg/config/protobuf"
 )
 
 type Settings struct {
@@ -16,56 +18,85 @@ type Settings struct {
 	Useragent string
 }
 
-type Response struct {
-	Uuid string
-	Url      string
-	Status   int
-	Hash     string
-	TitleNow string
-}
 
-func TestSite(UuidNow string, urlNow string) *RmqProto.BotJobResponse {
+func TestSite(PageId string, urlNow string,oldTitle string,Action uint32) *RmqProto.BotJobResponse {
+
 	res, err := http.Get(urlNow)
+	response:=&RmqProto.BotJobResponse{}
 	status:=true
-
-	if err != nil {
-		log.Printf("%s", err)
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != 200 {
-		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
-	}
-
-	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(res.Body)
-	if err != nil {
-		log.Printf("%s", err)
-	}
-
 	TitleNow := doc.Find("title").Text()
-	ContentNow := doc.Find("body").Text()
-	hasher := sha1.New()
-	hasher.Write([]byte(ContentNow))
-	HashNow := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
-	HashNow = string(HashNow)
-	StatusNow := res.StatusCode
 
-	if StatusNow == 200{
-		status = true
-	}else{
-		status = false
+	if err != nil{
+		log.Fatal(err)
 	}
 
-	response:=&RmqProto.BotJobResponse{
-		Uuid: UuidNow,
-		PageUrl: urlNow,
-		Status: status,
+	// Action = 1 (New) if Action = 2(Old)
+
+	switch Action {
+
+	case 1:
+		ContentNow := doc.Find("body").Text()
+		hasher := sha1.New()
+		hasher.Write([]byte(ContentNow))
+		HashNow := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+
+		response = &RmqProto.BotJobResponse{
+			PageId: PageId,
+			PageUrl: urlNow,
+			Status: status,
+			Title: TitleNow,
+			Hash: HashNow,
+
+		}
+
+	case 2:
+		if res.StatusCode != 200 || res.StatusCode != 500 || res.StatusCode != 501 || res.StatusCode != 504{
+			status = false
+
+			log.Print("status code error: %d %s", res.StatusCode, res.Status)
+			response = &RmqProto.BotJobResponse{
+				PageId: PageId,
+				PageUrl: urlNow,
+				Status: status,
+			}
+
+		}else{
+			status = true
+			// Similarity test
+
+			swg := metrics.NewSmithWatermanGotoh()
+			similarity := strutil.Similarity(oldTitle, TitleNow, swg)
+			if similarity < 70{
+				status = false
+				log.Print("status code error: %d %s", res.StatusCode, res.Status)
+				response = &RmqProto.BotJobResponse{
+					PageId: PageId,
+					PageUrl: urlNow,
+					Status: status,
+				}
+			}else{
+				ContentNow := doc.Find("body").Text()
+				hasher := sha1.New()
+				hasher.Write([]byte(ContentNow))
+				HashNow := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+
+				response = &RmqProto.BotJobResponse{
+					PageId: PageId,
+					PageUrl: urlNow,
+					Status: status,
+					Title: TitleNow,
+					Hash: HashNow,
+
+				}
+			}
+
+			log.Printf("Received a message: %s ,%s ", TitleNow , PageId)
+		}
 
 	}
 
-	log.Printf("Received a message: %s ,%s ", TitleNow , UuidNow)
 
-
+	defer res.Body.Close()
 	return response
 }

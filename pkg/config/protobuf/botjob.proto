@@ -1,23 +1,20 @@
 syntax = "proto3";
-package pb;
+
+package RmqProto;
 
 option go_package = "./";
 
 message BotJob {
-    string JobId  = 1;
-    string PageId = 2;
-    string PageUrl = 3;
-    repeated Action ToDo = 4;
-    message Action {
-      bool Screenshot = 1;
-      bool Availability = 2;
-    }
+  string PageId = 1;
+  string PageUrl = 2;
+  uint32 Action = 3;
+  string Title = 4;
 }
 
 message BotJobResponse {
-  string Uuid  = 1;
-  string PageId = 2;
-  string PageUrl = 3;
+  string PageId = 1;
+  string PageUrl = 2;
+  string Title = 3;
   bool Status = 4;
   string Hash = 5;
 }

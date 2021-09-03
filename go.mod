@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/adrg/strutil v0.2.3 // indirect
 	github.com/andybalholm/cascadia v1.2.0 // indirect
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
 )
