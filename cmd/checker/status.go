@@ -1,12 +1,12 @@
 package checker
 
 import (
-	"crypto"
-	"fmt"
+	"crypto/sha1"
+	"encoding/base64"
 	"github.com/PuerkitoBio/goquery"
-	"hash"
 	"log"
 	"net/http"
+	"zeithub.com/site-status-controller/pkg/config/protobuf"
 )
 
 type Settings struct {
@@ -17,19 +17,22 @@ type Settings struct {
 }
 
 type Response struct {
+	Uuid string
 	Url      string
 	Status   int
-	Hash     hash.Hash
+	Hash     string
 	TitleNow string
 }
 
-func TestSite(urlNow string) Response {
-
+func TestSite(UuidNow string, urlNow string) *RmqProto.BotJobResponse {
 	res, err := http.Get(urlNow)
+	status:=true
+
 	if err != nil {
 		log.Printf("%s", err)
 	}
 	defer res.Body.Close()
+
 	if res.StatusCode != 200 {
 		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
 	}
@@ -41,17 +44,28 @@ func TestSite(urlNow string) Response {
 	}
 
 	TitleNow := doc.Find("title").Text()
-	//ContentNow := doc.Find("body").Text()
-	checksum := crypto.MD5
-	HashNow := checksum.New()
-	//HashNow, err = HashNow.Write([]byte(ContentNow))
+	ContentNow := doc.Find("body").Text()
+	hasher := sha1.New()
+	hasher.Write([]byte(ContentNow))
+	HashNow := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+	HashNow = string(HashNow)
 	StatusNow := res.StatusCode
 
-	fmt.Printf("Checksum 1: %s\n", checksum)
+	if StatusNow == 200{
+		status = true
+	}else{
+		status = false
+	}
 
-	//log.Printf("Received a message: %s", title)
+	response:=&RmqProto.BotJobResponse{
+		Uuid: UuidNow,
+		PageUrl: urlNow,
+		Status: status,
 
-	responseNow := Response{urlNow, StatusNow, HashNow, TitleNow}
+	}
 
-	return responseNow
+	log.Printf("Received a message: %s ,%s ", TitleNow , UuidNow)
+
+
+	return response
 }

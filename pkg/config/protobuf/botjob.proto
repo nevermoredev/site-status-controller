@@ -1,0 +1,23 @@
+syntax = "proto3";
+package pb;
+
+option go_package = "./";
+
+message BotJob {
+    string JobId  = 1;
+    string PageId = 2;
+    string PageUrl = 3;
+    repeated Action ToDo = 4;
+    message Action {
+      bool Screenshot = 1;
+      bool Availability = 2;
+    }
+}
+
+message BotJobResponse {
+  string Uuid  = 1;
+  string PageId = 2;
+  string PageUrl = 3;
+  bool Status = 4;
+  string Hash = 5;
+}

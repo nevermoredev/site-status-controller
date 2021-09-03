@@ -1,4 +1,4 @@
-package config
+package rmq
 
 import (
 	"gopkg.in/yaml.v2"
@@ -12,7 +12,7 @@ type Config struct {
 	Password string
 }
 
-var configPath ="./build/rmqConfig.yaml"
+var configPath ="./pkg/config/rmq/rmqConfig.yaml"
 
 
 func GetConfig() *Config {

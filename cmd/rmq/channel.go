@@ -4,16 +4,12 @@ import (
 	"github.com/streadway/amqp"
 	"google.golang.org/protobuf/proto"
 	"log"
-	"zeithub.com/site-status-controller/api/config"
-	"zeithub.com/site-status-controller/build"
 	"zeithub.com/site-status-controller/cmd/checker"
+	"zeithub.com/site-status-controller/pkg/config/protobuf"
+	"zeithub.com/site-status-controller/pkg/config/rmq"
 )
 
-type Message struct {
-	PageId string `json:PageId`
-	Url    string `json:Url`
-	Action string `json:Action`
-}
+
 
 func failOnError(err error, msg string) {
 	if err != nil {
@@ -22,7 +18,7 @@ func failOnError(err error, msg string) {
 }
 
 func Listen() {
-	configRMQ := config.GetConfig()
+	configRMQ := rmq.GetConfig()
 	args := make(amqp.Table)
 	args["x-queue-mode"] = "lazy"
 	conn, err := amqp.Dial("amqp://test:password@" + configRMQ.Host + ":" + configRMQ.Port + "/")
@@ -34,8 +30,8 @@ func Listen() {
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		"botjobs", // name
-		true,      // durable
+		"spider-feed", // name
+		false,      // durable
 		false,     // delete when unused
 		false,     // exclusive
 		false,     // no-wait
@@ -45,7 +41,7 @@ func Listen() {
 
 	msgs, err := ch.Consume(
 		q.Name,    // queue
-		"service", // consumer
+		"site-status", // consumer
 		true,      // auto-ack
 		false,     // exclusive
 		false,     // no-local
@@ -58,14 +54,13 @@ func Listen() {
 
 	go func() {
 		for d := range msgs {
-			p := &pb.BotJob{}
+			p := &RmqProto.BotJobResponse{}
 			if err := proto.Unmarshal(d.Body, p); err != nil {
 				log.Fatalln("Failed to parse Person:", err)
 			}
-			//log.Printf("%s", err)
-			var titleNow = checker.CheckTitle(p.PageUrl)
-			//log.Printf("%s %s %d %s", SiteInfo.Url, SiteInfo.TitleNow, SiteInfo.Status, SiteInfo.Hash)
-			go Send(titleNow)
+			log.Printf("%s",p.PageUrl)
+			 	pageInfo := checker.TestSite(p.PageId,p.PageUrl)
+			Send(pageInfo)
 
 		}
 	}()

@@ -2,10 +2,12 @@ package rmq
 
 import (
 	"github.com/streadway/amqp"
+	"google.golang.org/protobuf/proto"
 	"log"
+	RmqProto "zeithub.com/site-status-controller/pkg/config/protobuf"
 )
 
-func Send(body string) {
+func Send(body *RmqProto.BotJobResponse) {
 	conn, err := amqp.Dial("amqp://test:password@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
@@ -14,9 +16,11 @@ func Send(body string) {
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
+	response, err := proto.Marshal(body)
+
 	q, err := ch.QueueDeclare(
-		"botresults", // name
-		true,         // durable
+		"spider-log", // name
+		false,         // durable
 		false,        // delete when unused
 		false,        // exclusive
 		false,        // no-wait (wait time for processing)
@@ -31,9 +35,9 @@ func Send(body string) {
 		false,  // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        []byte(body),
+			Body:        response,
 		})
-	log.Printf(" [x] Sent %s", body)
+	log.Print(response)
 	failOnError(err, "Failed to publish a message")
 
 }
