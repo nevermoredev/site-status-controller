@@ -9,7 +9,7 @@ import (
 
 func Send(body *RmqProto.BotJobResponse) {
 	conn, err := amqp.Dial("amqp://test:password@localhost:5672/")
-	failOnError(err, "Failed to connect to RabbitMQ")
+	log.Print("Connection failed, please check u config")
 	defer conn.Close()
 
 	ch, err := conn.Channel()
@@ -26,7 +26,7 @@ func Send(body *RmqProto.BotJobResponse) {
 		false,        // no-wait (wait time for processing)
 		nil,          // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
+	log.Print("Declare queue failed")
 
 	err = ch.Publish(
 		"",     // exchange
@@ -37,7 +37,7 @@ func Send(body *RmqProto.BotJobResponse) {
 			ContentType: "text/plain",
 			Body:        response,
 		})
-	log.Print(response)
-	failOnError(err, "Failed to publish a message")
+	//log.Print(response)
+	log.Print("Cant publish this data")
 
 }

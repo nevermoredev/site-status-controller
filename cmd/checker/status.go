@@ -28,7 +28,7 @@ func TestSite(PageId string, urlNow string,oldTitle string,Action uint32) *RmqPr
 	TitleNow := doc.Find("title").Text()
 
 	if err != nil{
-		log.Fatal(err)
+		log.Print("Cant get page from url")
 	}
 
 	// Action = 1 (New) if Action = 2(Old)
