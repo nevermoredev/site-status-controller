@@ -1,0 +1,41 @@
+# github.com/PuerkitoBio/goquery v1.7.1
+github.com/PuerkitoBio/goquery
+# github.com/adrg/strutil v0.2.3
+github.com/adrg/strutil
+github.com/adrg/strutil/internal/util
+github.com/adrg/strutil/metrics
+# github.com/andybalholm/cascadia v1.2.0
+github.com/andybalholm/cascadia
+# github.com/streadway/amqp v1.0.0
+github.com/streadway/amqp
+# golang.org/x/net v0.0.0-20210614182718-04defd469f4e
+golang.org/x/net/html
+golang.org/x/net/html/atom
+# google.golang.org/protobuf v1.27.1
+google.golang.org/protobuf/encoding/prototext
+google.golang.org/protobuf/encoding/protowire
+google.golang.org/protobuf/internal/descfmt
+google.golang.org/protobuf/internal/descopts
+google.golang.org/protobuf/internal/detrand
+google.golang.org/protobuf/internal/encoding/defval
+google.golang.org/protobuf/internal/encoding/messageset
+google.golang.org/protobuf/internal/encoding/tag
+google.golang.org/protobuf/internal/encoding/text
+google.golang.org/protobuf/internal/errors
+google.golang.org/protobuf/internal/filedesc
+google.golang.org/protobuf/internal/filetype
+google.golang.org/protobuf/internal/flags
+google.golang.org/protobuf/internal/genid
+google.golang.org/protobuf/internal/impl
+google.golang.org/protobuf/internal/order
+google.golang.org/protobuf/internal/pragma
+google.golang.org/protobuf/internal/set
+google.golang.org/protobuf/internal/strs
+google.golang.org/protobuf/internal/version
+google.golang.org/protobuf/proto
+google.golang.org/protobuf/reflect/protoreflect
+google.golang.org/protobuf/reflect/protoregistry
+google.golang.org/protobuf/runtime/protoiface
+google.golang.org/protobuf/runtime/protoimpl
+# gopkg.in/yaml.v2 v2.4.0
+gopkg.in/yaml.v2

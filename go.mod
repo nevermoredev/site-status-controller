@@ -1,4 +1,4 @@
-module zeithub.com/site-status-controller
+module github.com/zeithub/site-status-controller
 
 go 1.17
 
@@ -9,8 +9,4 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-require (
-	github.com/adrg/strutil v0.2.3 // indirect
-	github.com/andybalholm/cascadia v1.2.0 // indirect
-	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
-)
+require github.com/adrg/strutil v0.2.3

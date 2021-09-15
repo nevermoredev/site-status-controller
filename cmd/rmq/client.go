@@ -1,43 +1,30 @@
 package rmq
 
 import (
-	"github.com/streadway/amqp"
-	"google.golang.org/protobuf/proto"
 	"log"
-	RmqProto "zeithub.com/site-status-controller/pkg/config/protobuf"
+
+	"github.com/streadway/amqp"
+	RmqProto "github.com/zeithub/site-status-controller/pkg/config/protobuf"
+	"google.golang.org/protobuf/proto"
 )
 
-func Send(body *RmqProto.BotJobResponse) {
-	conn, err := amqp.Dial("amqp://test:password@localhost:5672/")
-	log.Print("Connection failed, please check u config")
-	defer conn.Close()
-
-	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
+func Send(ch2 *amqp.Channel, queue2 amqp.Queue, body *RmqProto.BotJobResponse) {
 
 	response, err := proto.Marshal(body)
 
-	q, err := ch.QueueDeclare(
-		"spider-log", // name
-		false,         // durable
-		false,        // delete when unused
-		false,        // exclusive
-		false,        // no-wait (wait time for processing)
-		nil,          // arguments
-	)
-	log.Print("Declare queue failed")
-
-	err = ch.Publish(
-		"",     // exchange
-		q.Name, // routing key
-		false,  // mandatory
-		false,  // immediate
+	err = ch2.Publish(
+		"",          // exchange
+		queue2.Name, // routing key
+		false,       // mandatory
+		false,       // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        response,
-		})
-	//log.Print(response)
-	log.Print("Cant publish this data")
+		},
+	)
+	if err != nil {
+		log.Printf("Error (client.Send): %v", err)
+		return
+	}
 
 }
